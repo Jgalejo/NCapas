@@ -27,6 +27,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'eventos:lista_deportes' %}">Listar</a></li>
                             <li><a class="dropdown-item" href="{% url 'eventos:crear_deporte' %}">Crear</a></li>
+                            
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -45,6 +46,15 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'eventos:lista_participantes' %}">Listar</a></li>
                             <li><a class="dropdown-item" href="{% url 'eventos:crear_participante' %}">Crear</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="equiposDropdown" role="button" data-bs-toggle="dropdown">
+                            Equipos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'eventos:lista_equipos' %}">Listar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'eventos:crear_equipo' %}">Crear</a></li>
                         </ul>
                     </li>
                 </ul>

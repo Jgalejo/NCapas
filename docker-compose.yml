@@ -17,13 +17,13 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=eventos_db
-      - POSTGRES_USER=eventos_user
-      - POSTGRES_PASSWORD=eventos_pass
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
     ports:
       - "5432:5432"
     restart: unless-stopped
