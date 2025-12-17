@@ -3,9 +3,9 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
-from .models import Deporte, Evento, Participante, Equipo
-from .forms import DeporteForm, EventoForm, ParticipanteForm, EquipoForm
-from .services import DeporteService, EventoService, ParticipanteService,  EquipoService
+from .models import Deporte, Evento, Participante, Equipo, Arbitro
+from .forms import DeporteForm, EventoForm, ParticipanteForm, EquipoForm, ArbitroForm
+from .services import DeporteService, EventoService, ParticipanteService,  EquipoService, ArbitroService
 
 
 
@@ -419,6 +419,77 @@ class EquipoDeleteView(DeleteView):
             equipo_id = self.kwargs.get('pk')
             EquipoService.eliminar(equipo_id)
             messages.success(self.request, 'Equipo eliminado exitosamente.')
+            return redirect(self.success_url)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return redirect(self.success_url)
+        
+        
+        
+
+
+# ==================== VISTAS PARA ÁRBITROS ====================
+
+class ArbitroListView(ListView):
+    model = Arbitro
+    template_name = 'eventos/lista_arbitros.html'
+    context_object_name = 'arbitros'
+
+    def get_queryset(self):
+        return ArbitroService.obtener_todos()
+
+class ArbitroCreateView(CreateView):
+    model = Arbitro
+    form_class = ArbitroForm
+    template_name = 'eventos/crear_arbitro.html'
+    success_url = reverse_lazy('eventos:lista_arbitros')
+
+    def form_valid(self, form):
+        try:
+            ArbitroService.crear(
+                nombre=form.cleaned_data['nombre'],
+                apellido=form.cleaned_data['apellido'],
+                email=form.cleaned_data['email'],
+                deporte_id=form.cleaned_data['deporte'].id,
+                telefono=form.cleaned_data.get('telefono')
+            )
+            messages.success(self.request, 'Árbitro creado exitosamente.')
+            return redirect(self.success_url)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+class ArbitroUpdateView(UpdateView):
+    model = Arbitro
+    form_class = ArbitroForm
+    template_name = 'eventos/crear_arbitro.html'
+    success_url = reverse_lazy('eventos:lista_arbitros')
+
+    def form_valid(self, form):
+        try:
+            ArbitroService.actualizar(
+                self.kwargs.get('pk'),
+                nombre=form.cleaned_data['nombre'],
+                apellido=form.cleaned_data['apellido'],
+                email=form.cleaned_data['email'],
+                deporte_id=form.cleaned_data['deporte'].id,
+                telefono=form.cleaned_data.get('telefono')
+            )
+            messages.success(self.request, 'Árbitro actualizado exitosamente.')
+            return redirect(self.success_url)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+class ArbitroDeleteView(DeleteView):
+    model = Arbitro
+    template_name = 'eventos/eliminar_arbitro.html'
+    success_url = reverse_lazy('eventos:lista_arbitros')
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            ArbitroService.eliminar(self.kwargs.get('pk'))
+            messages.success(self.request, 'Árbitro eliminado exitosamente.')
             return redirect(self.success_url)
         except ValidationError as e:
             messages.error(self.request, str(e))

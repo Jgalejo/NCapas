@@ -105,3 +105,26 @@ class Equipo(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.deporte.nombre})"
+    
+
+class Arbitro(models.Model):
+        """Modelo para representar un árbitro o juez"""
+        nombre = models.CharField(max_length=100, verbose_name="Nombre")
+        apellido = models.CharField(max_length=100, verbose_name="Apellido")
+        email = models.EmailField(unique=True, validators=[EmailValidator()], verbose_name="Email")
+        telefono = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono")
+        deporte = models.ForeignKey(
+            Deporte, 
+            on_delete=models.CASCADE, 
+            related_name='arbitros',
+            verbose_name="Deporte de Especialidad"
+        )
+        fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
+
+        class Meta:
+            verbose_name = "Árbitro"
+            verbose_name_plural = "Árbitros"
+            ordering = ['apellido', 'nombre']
+
+        def __str__(self):
+            return f"{self.apellido}, {self.nombre} ({self.deporte.nombre})"

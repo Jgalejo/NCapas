@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import Deporte, Evento, Participante, Equipo
+from .models import Deporte, Evento, Participante, Equipo, Arbitro
 
 
 class DeporteForm(forms.ModelForm):
@@ -202,3 +202,20 @@ class EquipoForm(forms.ModelForm):
             if not ciudad:
                 raise ValidationError("La ciudad no puede estar vacía")
         return ciudad
+
+
+# Al final:
+class ArbitroForm(forms.ModelForm):
+    class Meta:
+        model = Arbitro
+        fields = ['nombre', 'apellido', 'email', 'deporte', 'telefono']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellido': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'deporte': forms.Select(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+    
+    def clean_email(self):
+        return self.cleaned_data.get('email').lower().strip()

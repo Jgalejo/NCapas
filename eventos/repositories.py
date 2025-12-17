@@ -1,6 +1,6 @@
 from typing import List, Optional
 from django.db.models import QuerySet
-from .models import Deporte, Evento, Participante, EventoParticipante, Equipo
+from .models import Deporte, Evento, Participante, EventoParticipante, Equipo,  Arbitro
 
 
 class DeporteRepository:
@@ -259,4 +259,58 @@ class EquipoRepository:
             equipo.delete()
             return True
         except Equipo.DoesNotExist:
+            return False
+# Al inicio del archivo:
+
+
+# Al final del archivo:
+class ArbitroRepository:
+    """Repositorio para operaciones de acceso a datos de Árbitro"""
+
+    @staticmethod
+    def get_all() -> QuerySet[Arbitro]:
+        return Arbitro.objects.select_related('deporte').all()
+
+    @staticmethod
+    def get_by_id(arbitro_id: int) -> Optional[Arbitro]:
+        try:
+            return Arbitro.objects.select_related('deporte').get(pk=arbitro_id)
+        except Arbitro.DoesNotExist:
+            return None
+    
+    @staticmethod
+    def get_by_email(email: str) -> Optional[Arbitro]:
+        try:
+            return Arbitro.objects.get(email=email)
+        except Arbitro.DoesNotExist:
+            return None
+
+    @staticmethod
+    def create(nombre: str, apellido: str, email: str, deporte_id: int, telefono: str = None) -> Arbitro:
+        return Arbitro.objects.create(
+            nombre=nombre,
+            apellido=apellido,
+            email=email,
+            deporte_id=deporte_id,
+            telefono=telefono
+        )
+
+    @staticmethod
+    def update(arbitro: Arbitro, nombre: str = None, apellido: str = None,
+               email: str = None, deporte_id: int = None, telefono: str = None) -> Arbitro:
+        if nombre: arbitro.nombre = nombre
+        if apellido: arbitro.apellido = apellido
+        if email: arbitro.email = email
+        if deporte_id: arbitro.deporte_id = deporte_id
+        if telefono is not None: arbitro.telefono = telefono
+        arbitro.save()
+        return arbitro
+
+    @staticmethod
+    def delete(arbitro_id: int) -> bool:
+        try:
+            arbitro = Arbitro.objects.get(pk=arbitro_id)
+            arbitro.delete()
+            return True
+        except Arbitro.DoesNotExist:
             return False

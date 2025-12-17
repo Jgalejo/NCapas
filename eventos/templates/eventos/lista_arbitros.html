@@ -1,0 +1,48 @@
+{% extends 'eventos/base.html' %}
+
+{% block title %}Árbitros - Sistema de Eventos Deportivos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lista de Árbitros</h1>
+    <a href="{% url 'eventos:crear_arbitro' %}" class="btn btn-primary">Registrar Árbitro</a>
+</div>
+
+{% if arbitros %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Deporte</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for arbitro in arbitros %}
+            <tr>
+                <td>{{ arbitro.id }}</td>
+                <td>{{ arbitro.nombre }}</td>
+                <td>{{ arbitro.apellido }}</td>
+                <td><span class="badge bg-secondary">{{ arbitro.deporte.nombre }}</span></td>
+                <td>{{ arbitro.email }}</td>
+                <td>{{ arbitro.telefono|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'eventos:editar_arbitro' arbitro.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'eventos:eliminar_arbitro' arbitro.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No hay árbitros registrados. <a href="{% url 'eventos:crear_arbitro' %}">Registrar el primero</a>
+</div>
+{% endif %}
+{% endblock %}

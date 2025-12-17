@@ -2,7 +2,7 @@ from typing import Optional, List
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .models import Deporte, Evento, Participante
-from .repositories import DeporteRepository, EventoRepository, ParticipanteRepository, EquipoRepository
+from .repositories import DeporteRepository, EventoRepository, ParticipanteRepository, EquipoRepository, ArbitroRepository
 
 
 
@@ -399,3 +399,62 @@ class EquipoService:
         # Por ejemplo: no permitir eliminar equipos con eventos asociados
 
         return EquipoRepository.delete(equipo_id)
+    
+    
+
+# Al final del archivo:
+class ArbitroService:
+    """Servicio con lógica de negocio para Árbitro"""
+
+    @staticmethod
+    def obtener_todos():
+        return ArbitroRepository.get_all()
+
+    @staticmethod
+    def obtener_por_id(arbitro_id: int):
+        return ArbitroRepository.get_by_id(arbitro_id)
+
+    @staticmethod
+    def crear(nombre: str, apellido: str, email: str, deporte_id: int, telefono: str = None):
+        # Validaciones básicas
+        if not nombre or not nombre.strip(): raise ValidationError("El nombre es obligatorio")
+        if not apellido or not apellido.strip(): raise ValidationError("El apellido es obligatorio")
+        
+        # Validación de Email
+        email_limpio = email.strip().lower()
+        if ArbitroRepository.get_by_email(email_limpio):
+            raise ValidationError(f"Ya existe un árbitro con el email '{email_limpio}'")
+            
+        # Validar deporte
+        if not DeporteRepository.get_by_id(deporte_id):
+             raise ValidationError(f"No se encontró el deporte con ID {deporte_id}")
+
+        return ArbitroRepository.create(
+            nombre=nombre.strip(),
+            apellido=apellido.strip(),
+            email=email_limpio,
+            deporte_id=deporte_id,
+            telefono=telefono.strip() if telefono else None
+        )
+
+    @staticmethod
+    def actualizar(arbitro_id: int, nombre: str = None, apellido: str = None,
+                   email: str = None, deporte_id: int = None, telefono: str = None):
+        arbitro = ArbitroRepository.get_by_id(arbitro_id)
+        if not arbitro:
+            raise ValidationError(f"No se encontró el árbitro con ID {arbitro_id}")
+            
+        # Validación de duplicidad de email al actualizar
+        if email:
+            email_limpio = email.strip().lower()
+            existente = ArbitroRepository.get_by_email(email_limpio)
+            if existente and existente.id != arbitro_id:
+                raise ValidationError(f"El email '{email_limpio}' ya está en uso por otro árbitro")
+            email = email_limpio
+
+        return ArbitroRepository.update(arbitro, nombre, apellido, email, deporte_id, telefono)
+
+    @staticmethod
+    def eliminar(arbitro_id: int):
+        # Aquí podrías agregar validación: No eliminar si está asignado a un evento futuro
+        return ArbitroRepository.delete(arbitro_id)
